@@ -4,14 +4,19 @@ import android.graphics.Bitmap;
 import android.support.v4.util.LruCache;
 
 /**
+ * Singleton class that implements bitmap cache in memory
+ *
  * Created by vheineck on 28/04/15.
  */
 public class BitmapCache {
 
+    //Singleton instance
     private static BitmapCache instance;
 
+    //memory cache
     private LruCache<String, Bitmap> mMemoryCache;
 
+    //Gets singleton instance
     public static BitmapCache getInstance() {
 
         if (instance == null) {
@@ -21,6 +26,7 @@ public class BitmapCache {
         return instance;
 
     }
+
 
     private BitmapCache() {
 
@@ -43,15 +49,24 @@ public class BitmapCache {
 
     }
 
+    /** Adds bitmap to cache
+     *
+     * @param key
+     * @param bitmap
+     */
     public void addBitmapToMemoryCache(String key, Bitmap bitmap) {
         if (getBitmapFromMemCache(key) == null) {
             mMemoryCache.put(key, bitmap);
         }
     }
 
+    /** Gets bitmap from cache
+     *
+     * @param key
+     * @return
+     */
     public Bitmap getBitmapFromMemCache(String key) {
         return mMemoryCache.get(key);
     }
-
 
 }

@@ -17,6 +17,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
+ * Custom ImageView that implements download image from URL.
+ *
  * Created by vheineck on 28/04/15.
  */
 public class ACOImageView extends ImageView {
@@ -25,25 +27,48 @@ public class ACOImageView extends ImageView {
 
     Drawable mPlaceholder;
 
+    public ACOImageView(Context context) {
+        super(context);
+    }
+
     public ACOImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public void setImageURL(Drawable placeholder, String URL) {
+    public ACOImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+    }
+
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        // TODO Auto-generated method stub
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        invalidate();
+    }
+
+    /** Set image from URL. While url is not loaded, a placeholder image will be shown.
+     *
+     * @param placeholder
+     * @param url
+     */
+    public void setImageURL(Drawable placeholder, String url) {
 
         this.mPlaceholder = placeholder;
 
         DownloadImageFromWebTask webTask = new DownloadImageFromWebTask();
-        webTask.execute(URL);
+        webTask.execute(url);
 
     }
 
+    /** Async task for download image in background
+     *
+     */
     private class DownloadImageFromWebTask extends AsyncTask<String,Void,Bitmap> {
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
 
+            //shows placeholder on imageview
             setImageDrawable(mPlaceholder);
 
         }
@@ -70,13 +95,22 @@ public class ACOImageView extends ImageView {
                     URL url = new URL(params[0]);
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-                    InputStream is = connection.getInputStream();
+                    int responseCode = connection.getResponseCode();
 
-                    ret = BitmapFactory.decodeStream(is);
-                    //ret = BitmapHelper.decodeSampledBitmapFromStream(is, w, h); //later code
+                    if (responseCode == 200) { // Connection OK
 
-                    //adding image to cache
-                    BitmapCache.getInstance().addBitmapToMemoryCache(urlString, ret);
+                        // get inputStream
+                        InputStream is = connection.getInputStream();
+
+                        //create Bitmap from inputStream
+                        ret = BitmapFactory.decodeStream(is);
+                        //ret = BitmapHelper.decodeSampledBitmapFromStream(is, w, h); //later code
+
+                        //adding image to cache
+                        BitmapCache.getInstance().addBitmapToMemoryCache(urlString, ret);
+                    } else {
+                        Log.d(TAG, "image request is not loaded");
+                    }
 
                 } else { //image exists in cache
 
@@ -97,6 +131,7 @@ public class ACOImageView extends ImageView {
         protected void onPostExecute(Bitmap bitmap) {
             super.onPostExecute(bitmap);
 
+            //Shows image loaded from url
             if (bitmap != null) {
                 setImageBitmap(bitmap);
             }

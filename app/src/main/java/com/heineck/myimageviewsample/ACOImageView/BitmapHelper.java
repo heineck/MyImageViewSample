@@ -10,10 +10,20 @@ import java.io.InputStream;
 import java.net.URL;
 
 /**
+ * Support class for Bitmap processing
+ *
  * Created by vheineck on 28/04/15.
  */
 public class BitmapHelper {
 
+    /**
+     * Calculates sample size
+     *
+     * @param options
+     * @param reqWidth
+     * @param reqHeight
+     * @return
+     */
     public static int calculateInSampleSize(
             BitmapFactory.Options options, int reqWidth, int reqHeight) {
         // Raw height and width of image
@@ -37,6 +47,13 @@ public class BitmapHelper {
         return inSampleSize;
     }
 
+    /** Gets Bitmap from inputStream downsampled.
+     *
+     * @param bis
+     * @param reqWidth
+     * @param reqHeight
+     * @return
+     */
     public static Bitmap decodeSampledBitmapFromStream(InputStream bis,
                                                          int reqWidth, int reqHeight) {
 
